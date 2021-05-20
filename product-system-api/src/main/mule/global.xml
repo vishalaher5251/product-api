@@ -13,7 +13,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     <db:config name="Database_Config" doc:name="Database Config" doc:id="d30594d8-0517-4aeb-8138-a1bb8bdf75b5" >
 		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.user}" password="${db.password}" database="${db.database}" />
 	</db:config>
-	<configuration-properties doc:name="Configuration properties" doc:id="afe7f46b-fb04-48d5-b0e0-5fcdfba030ce" file="product-${env}.yaml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="afe7f46b-fb04-48d5-b0e0-5fcdfba030ce" file="product-PROD.yaml" />
 	<configuration doc:name="Configuration" doc:id="0e812a78-b02a-47f2-b5fa-3f2de19a883a" defaultErrorHandler-ref="globalError_Handler" />
 	<error-handler name="globalError_Handler" doc:id="f97f214f-7c6e-44c9-a63e-baaa07281f34" >
 		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="09a8f229-1472-49b7-ab73-8ba13ff74798" type="DB1:BAD_SQL_SYNTAX" >
