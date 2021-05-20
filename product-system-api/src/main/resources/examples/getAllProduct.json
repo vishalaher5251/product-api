@@ -1,0 +1,18 @@
+[
+  {
+    "productCode": "P1001",
+    "productName": "OnePlus 9 Pro",
+    "productLine": "Mobile",
+    "productVendor": "OnePlus",
+    "quantityInStock": 200,
+    "MSRP": 64999
+  },
+  {
+    "productCode": "P1002",
+    "productName": "OnePlus 9R",
+    "productLine": "Mobile",
+    "productVendor": "OnePlus",
+    "quantityInStock": 250,
+    "MSRP": 39999
+  }
+]

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-test-suite.xml" />
+	<munit:test name="implementation-test-suite-GETallProductsFlowTest" doc:id="c5161b02-9856-40ee-95d2-44d954bd7d3f" description="Test">
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="2444507b-3e94-4a68-97fe-abb9befcafbd" />
+			<flow-ref doc:name="Flow-ref to GETallProductsFlow" doc:id="e6425f60-bf7a-4f8e-a55c-aaa6fa7a43b6" name="GETallProductsFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="592dc7e1-64d0-409c-b008-d59014708665" message='"Retrieved null payload"' expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-GETProductsbyPCFlowTest" doc:id="1d5a83d7-8751-4cf0-9177-7c6e7abaab9c" description="Test">
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="ae6a8b43-1714-46b8-837b-b2322561f979" />
+			<munit:set-event doc:name="Set Event" doc:id="1466fa46-e262-4e83-a841-7c650e6adc5a" >
+				<munit:variables >
+					<munit:variable key="productCode" value='"P1001"' mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to GETProductsbyPCFlow" doc:id="c0e8045a-6295-413b-bfd9-7a1996da4fdd" name="GETProductsbyPCFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="2e048fad-30ec-40cc-9066-318adcb6fcd7" actual="#[payload]" expected='#[{&#10;        "productCode": "P1001",&#10;        "productName": "OnePlus 9 Pro",&#10;        "productLine": "Mobile",&#10;        "productScale": "",&#10;        "productVendor": "OnePlus",&#10;        "productDescription": "",&#10;        "quantityInStock": 200,&#10;        "buyPrice": 0,&#10;        "MSRP": 64999.0&#10;    }]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-DELETEProductbyPCFlowTest" doc:id="e5f77e5f-888a-42f6-8691-8ebfab281606" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="40f27f7c-3d0e-4f3e-bc67-9951a6fe4b10" processor="db:delete">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1926d6c5-1345-4896-9a32-c3890024f25b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="4adebc4f-47c9-4635-ba35-cc5b9656397e" />
+			<flow-ref doc:name="Flow-ref to DELETEProductbyPCFlow" doc:id="f2ac6a77-a84a-4149-90ba-6b27967c09f6" name="DELETEProductbyPCFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="8e7f791f-abff-416f-8d81-c207b051770f" actual="#[payload]" expected='#[{&#10;	message: "Product has been Deleted for the given ProductCode."&#10;}]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-VariableSub_FlowTest" doc:id="17707145-809d-4fd4-823a-493a5681621a" description="Test">
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="10ebe160-bc95-4b15-93fb-b898adfc8b45" />
+			<munit:set-event doc:name="Set Event" doc:id="acebadc6-163f-49a3-a4d2-1b946e355dee" >
+				<munit:payload value='{&#10;    "productName": "OnePlus 9 Pro",&#10;    "productLine": "Mobile",&#10;    "productScale": "",&#10;    "productVendor": "OnePlus",&#10;    "productDescription": "",&#10;    "quantityInStock": 200,&#10;    "buyPrice": 0,&#10;    "MSRP": 64999.0&#10;}' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to VariableSub_Flow" doc:id="fd648fe5-3267-49ef-a3b1-699470e28111" name="VariableSub_Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals productName" doc:id="92502ce7-1895-4a18-b74f-96be0c14f5b0" actual="#[vars.productName]" expected='#["OnePlus 9 Pro"]' message="Enter ProductName"/>
+			<munit-tools:assert-equals doc:name="Assert equals productLine" doc:id="c586febb-d4a1-4ab0-b7a8-42274027f429" actual="#[vars.productLine]" expected='#["Mobile"]' message="enter productLine"/>
+			<munit-tools:assert-equals doc:name="Assert equals productVendor" doc:id="dd96ffeb-594c-40b0-830f-07e62544402c" actual="#[vars.productVendor]" expected='#["OnePlus"]'/>
+			<munit-tools:assert-equals doc:name="Assert equals quantityInStock" doc:id="194d269c-ef7d-4844-8d75-a533707f7e2a" actual="#[vars.quantityInStock]" expected="#[200]"/>
+			<munit-tools:assert-equals doc:name="Assert equals MSRP" doc:id="59b56933-45b3-4497-9ae9-650c7628275b" actual="#[vars.MSRP]" expected="#[64999.0]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-POSTProductDetailsFlowTest" doc:id="edbb51a3-4d67-400d-bd10-20e79f9f876c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="39075076-dc29-4167-a598-29d1db346816" processor="db:query-single">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9f5bc016-1208-4385-a903-b2f3dce88bfa" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;	"max(productCode)": "P1001"&#10;}]' mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="07dc9437-e31b-4cf0-b462-0971121c3c36" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1ec4318f-e227-4599-a405-1f499a5f42f0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="e60b1ef0-ac8d-409a-b4c8-49afbb77ec64" />
+			<munit:set-event doc:name="Set Event" doc:id="88130b37-0ed4-4cc5-869a-05105f35333b" >
+				<munit:payload value='    {&#10;        "productName": "OnePlus 9 Pro",&#10;        "productLine": "Mobile",&#10;        "productScale": "",&#10;        "productVendor": "OnePlus",&#10;        "productDescription": "",&#10;        "quantityInStock": 200,&#10;        "buyPrice": 0,&#10;        "MSRP": 64999.0&#10;    }' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to POSTProductDetailsFlow" doc:id="f84c2348-cb18-4be8-977b-e96e5f0c7538" name="POSTProductDetailsFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="8f11381b-4568-4498-a21d-c9a48e097f8c" actual="#[payload]" expected='#[{&#10;	message: "Product has been added Successfully."&#10;}]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-PUTProductDetailsbyPCFlowTest" doc:id="8d96b11d-2c0b-487d-a749-fd0c49cd0b6e" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="257a4688-5518-4304-88f9-3757e4c4c057" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="adbd3b04-d9af-4831-8d4f-aa11648b2a8f" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="405bc2a1-6e2d-4128-ba42-231143370b91" />
+			<munit:set-event doc:name="Set Event" doc:id="1710f9c2-330f-4c48-a092-ed16503ad3bb" >
+				<munit:payload value='    {&#10;        "productName": "OnePlus 9 Pro",&#10;        "productLine": "Mobile",&#10;        "productScale": "",&#10;        "productVendor": "OnePlus",&#10;        "productDescription": "",&#10;        "quantityInStock": 200,&#10;        "buyPrice": 0,&#10;        "MSRP": 64999.0&#10;    }' mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="productCode" value='"P1001"' mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PUTProductDetailsbyPCFlow" doc:id="371947d8-a246-4216-86fc-f4f751f6d3b8" name="PUTProductDetailsbyPCFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="1cf9ee83-e58f-41d7-8cd9-c99176d73373" actual="#[payload]" expected='#[{&#10;	message: "Product data is Modified for the given ProductCode."&#10;}]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-PUTProductDetailsbyPCFlowTest1" doc:id="95dfc272-b8b3-4d9a-a163-bdcf528ef227" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e219dd79-0d84-43fd-bde5-c99229bd09c5" processor="db:query-single">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2a1584cb-01db-4e50-b581-3d0a5166da12" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;	"max(productCode)": "P1014"&#10;}]' mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b3215ce7-1705-40d3-9a60-1e0cf370ceb3" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="afd16ec3-9812-43ac-9c21-1bfc6147f921" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="fc667ef5-005a-41de-8bff-4d4c446ae554" />
+			<munit:set-event doc:name="Set Event" doc:id="529b4370-827b-40cf-9252-bfb6344e001c" >
+				<munit:payload value='    {&#10;        "productName": "OnePlus 9 Pro",&#10;        "productLine": "Mobile",&#10;        "productScale": "",&#10;        "productVendor": "OnePlus",&#10;        "productDescription": "",&#10;        "quantityInStock": 200,&#10;        "buyPrice": 0,&#10;        "MSRP": 64999.0&#10;    }' mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="productCode" value='"P1014"' mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PUTProductDetailsbyPCFlow" doc:id="dbadb515-331d-4963-b466-97d89c466d41" name="PUTProductDetailsbyPCFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="213306bc-ced6-4ed7-8af7-797415974b97" actual="#[payload]" expected='#[{&#10;	message: "Product data is Inserted."&#10;}]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-PATCHProductDetailsbyPCFlowTest" doc:id="9fd68461-2427-48c0-8790-6f2dec8135f4" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="024a81c1-a4ea-4b78-b9e3-4748a3b62c3e" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="699acdb7-0344-4e6b-82cc-ef91b9099f44" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="b6c37acf-22e3-4fd0-a9e8-8be3a1f2182c" />
+			<munit:set-event doc:name="Set Event" doc:id="e77230b8-0c11-45da-a822-b695a1dd8c1f" >
+				<munit:payload value='    {&#10;		"productName": "OnePlus 9 Pro",&#10;        "productLine": "Mobile",&#10;        "productScale": "",&#10;        "productVendor": "OnePlus",&#10;        "productDescription": "",&#10;        "quantityInStock": 200,&#10;        "buyPrice": 0,&#10;        "MSRP": 64999.0&#10;    }' mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="productCode" value='"P1001"' mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PATCHProductDetailsbyPCFlow" doc:id="844060f0-26b4-4ae8-bc76-b6377049a1c0" name="PATCHProductDetailsbyPCFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="520104ff-b30c-44e7-ad50-4a0d391e0677" actual="#[payload]" expected='#[{&#10;	message: "Product details are updated for the given ProductCode"&#10;}]' message="{"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

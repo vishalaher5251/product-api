@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="GETallProductsFlow" doc:id="e7a2098c-9c29-499d-b1e2-3c2099287a35" >
+		<db:select doc:name="Select all Product Details " doc:id="481e49cf-aaea-470d-ab49-387137eda931" config-ref="Database_Config">
+			<error-mapping sourceType="DB:BAD_SQL_SYNTAX" targetType="DB1:BAD_SQL_SYNTAX" />
+			<db:sql ><![CDATA[select * from Products;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="2c9a7cbf-4d43-41ac-b370-02945229af2b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	productCode: payload01.productCode,
+	productName: payload01.productName default "",
+	productLine: payload01.productLine default "",
+	productScale: payload01.productScale default "",
+	productVendor: payload01.productVendor default "",
+	productDescription: payload01.productDescription as String default "",
+	quantityInStock: payload01.quantityInStock default 0,
+	buyPrice: payload01.buyPrice default 0,
+	MSRP: payload01.MSRP default 0
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GETProductsbyPCFlow" doc:id="410ee577-d3df-463e-a8d8-a8ef335ad78a" >
+		<db:query-single doc:name="Select Product by ProductCode" doc:id="a641381e-9519-48bd-b69a-6118de78fc60" config-ref="Database_Config">
+			<error-mapping sourceType="DB:BAD_SQL_SYNTAX" targetType="DB2:BAD_SQL_SYNTAX" />
+			<db:sql ><![CDATA[select * from Products where productCode = :productCode;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'productCode': vars.productCode
+}]]]></db:input-parameters>
+		</db:query-single>
+		<choice doc:name="Choice" doc:id="ea2b9ff5-5d1d-4c28-9bea-969f116118b6" >
+			<when expression="#[sizeOf(payload)&gt;0]">
+				<ee:transform doc:name="Transform Message" doc:id="cb9fa294-8e93-4d21-bd2e-5bb4e9d5c68c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	productCode: payload.productCode,
+	productName: payload.productName default "",
+	productLine: payload.productLine default "",
+	productScale: payload.productScale default "",
+	productVendor: payload.productVendor default "",
+	productDescription: payload.productDescription as String default "",
+	quantityInStock: payload.quantityInStock default 0,
+	buyPrice: payload.buyPrice default 0,
+	MSRP: payload.MSRP default 0
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Empty Array" doc:id="fc4089e6-5ad0-4255-a71f-d182209106a6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="DELETEProductbyPCFlow" doc:id="87827214-02e7-4b0a-8df6-21ee8418f497" >
+		<db:delete doc:name="Delete" doc:id="1926d6c5-1345-4896-9a32-c3890024f25b" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from Products where productCode = :productCode]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'productCode': vars.productCode
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="1bbb8c6e-48d7-4c7a-ae0f-459257c18748" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Product has been Deleted for the given ProductCode."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="VariableSub_Flow" doc:id="e8b2c1ed-332a-4ee3-b5b9-72ce1d060b0c" >
+		<set-variable value="#[payload.productName]" doc:name="Product Name" doc:id="5994d761-dc28-44e5-af51-01a4b27afdba" variableName="productName"/>
+		<set-variable value="#[payload.productLine]" doc:name="Product Line" doc:id="01775a3a-c6d4-4777-a0ef-e37df0af525c" variableName="productLine"/>
+		<set-variable value="#[payload.productScale]" doc:name="Product Scale" doc:id="687c2a57-3501-4271-b3f9-6015f19183f8" variableName="productScale"/>
+		<set-variable value="#[payload.productVendor]" doc:name="Product Vendor" doc:id="873d79d7-a88d-48cc-93fc-d9666bbd1f2f" variableName="productVendor"/>
+		<set-variable value="#[payload.productDescription]" doc:name="Product Description" doc:id="c5aabd20-7c7f-4b7d-9066-9562812f16a4" variableName="productDescription"/>
+		<set-variable value="#[payload.quantityInStock]" doc:name="Quantity InStock" doc:id="18a9ca35-4933-47b8-b9b4-05ca0a5dbdf7" variableName="quantityInStock"/>
+		<set-variable value="#[payload.buyPrice]" doc:name="Buy Price" doc:id="8d72c1d4-5130-497f-bdf8-1bd6ff521732" variableName="buyPrice"/>
+		<set-variable value="#[payload.MSRP]" doc:name="MSRP" doc:id="0b9429e1-c8fb-43b9-b173-9452fc39bd0f" variableName="MSRP"/>
+	</sub-flow>
+	<flow name="POSTProductDetailsFlow" doc:id="2e286430-5303-4349-ba73-3075d7561a3e" >
+		<flow-ref doc:name="Variable SubFlow" doc:id="ac4d2255-6399-4bbf-abd1-a4dc4cb6ae14" name="VariableSub_Flow"/>
+		<db:query-single doc:name="Query single" doc:id="9f5bc016-1208-4385-a903-b2f3dce88bfa" config-ref="Database_Config">
+			<db:sql ><![CDATA[select max(productCode) from Products;]]></db:sql>
+		</db:query-single>
+		<ee:transform doc:name="Transform Message" doc:id="88e969d7-110c-41b7-9680-325ccafc6387" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "P" ++ ((payload."max(productCode)"[1 to 4] as Number)+1)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:insert doc:name="Insert" doc:id="1ec4318f-e227-4599-a405-1f499a5f42f0" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into Products values
+(:productCode, :productName, :productLine, :productScale, :productVendor, :productDescription, :quantityInStock, :buyPrice, :MSRP); ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'productCode': payload.message,
+	'productName': vars.productName,
+	'productLine': vars.productLine,
+	'productScale': vars.productScale,
+	'productVendor': vars.productVendor,
+	'productDescription': vars.productDescription,
+	'quantityInStock': vars.quantityInStock,
+	'buyPrice': vars.buyPrice,
+	'MSRP': vars.MSRP
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="7cac9736-e680-48ea-bf38-c51e1428e908" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Product has been added Successfully."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="201" doc:name="httpStatus" doc:id="b4bd5be1-00db-448e-b75e-2e6e2374fd6b" variableName="httpStatus"/>
+	</flow>
+	<flow name="PATCHProductDetailsbyPCFlow" doc:id="f1070cb1-9295-4fef-ae7a-2b16730899eb" >
+		<flow-ref doc:name="Variable SubFlow" doc:id="4f125ca2-48db-43df-9715-1df20d057dac" name="VariableSub_Flow"/>
+		<db:query-single doc:name="Query single" doc:id="bbdd70cb-def1-4d81-9f7d-34f5115dd827" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from Products where productCode = :productCode;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'productCode': vars.productCode
+}]]]></db:input-parameters>
+		</db:query-single>
+		<db:update doc:name="Update" doc:id="699acdb7-0344-4e6b-82cc-ef91b9099f44" config-ref="Database_Config">
+			<db:sql ><![CDATA[update Products set productName = :productName, productLine = :productLine,productScale = :productScale,productVendor = :productVendor,productDescription = :productDescription,quantityInStock = :quantityInStock,buyPrice = :buyPrice, MSRP = :MSRP where productCode = :productCode;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'productCode': vars.productCode,
+	'productName': vars.productName default payload.productName,
+	'productLine': vars.productLine default payload.productLine,
+	'productScale': vars.productScale default payload.productLine,
+	'productVendor': vars.productVendor default payload.productVendor,
+	'productDescription': vars.productDescription default payload.productDescription,
+	'quantityInStock': vars.quantityInStock default payload.quantityInStock,
+	'buyPrice': vars.buyPrice default payload.buyPrice,
+	'MSRP': vars.MSRP default payload.MSRP
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="e985c4a7-f69f-4f14-a11e-bb400e56da3c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Product details are updated for the given ProductCode"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="PUTProductDetailsbyPCFlow" doc:id="70bd48cf-2dba-40f2-8050-bbc4a21e8012" >
+		<flow-ref doc:name="Variable SubFlow" doc:id="04a6f2e7-97f9-4137-9a17-53b3b6aec6fa" name="VariableSub_Flow"/>
+		<db:query-single doc:name="Query single" doc:id="b64ad781-dde7-4450-a69c-68aecf3a28f0" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from Products where productCode = :productCode;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'productCode': vars.productCode
+}]]]></db:input-parameters>
+		</db:query-single>
+		<choice doc:name="Choice" doc:id="9266e841-982c-4375-8353-5cf24368467b" >
+			<when expression="#[sizeOf(payload)&gt;0]">
+				<db:update doc:name="Update" doc:id="adbd3b04-d9af-4831-8d4f-aa11648b2a8f" config-ref="Database_Config">
+					<db:sql ><![CDATA[update Products set productName = :productName, productLine = :productLine,productScale = :productScale,productVendor = :productVendor,productDescription = :productDescription,quantityInStock = :quantityInStock,buyPrice = :buyPrice, MSRP = :MSRP where productCode = :productCode]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	'productCode': vars.productCode,
+	'productName': vars.productName default payload.productName,
+	'productLine': vars.productLine default payload.productLine,
+	'productScale': vars.productScale default payload.productLine,
+	'productVendor': vars.productVendor default payload.productVendor,
+	'productDescription': vars.productDescription default payload.productDescription,
+	'quantityInStock': vars.quantityInStock default payload.quantityInStock,
+	'buyPrice': vars.buyPrice default payload.buyPrice,
+	'MSRP': vars.MSRP default payload.MSRP
+}]]]></db:input-parameters>
+				</db:update>
+				<ee:transform doc:name="Transform Message" doc:id="16ddd918-c0a1-4b3a-a1af-201825fe12f5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Product data is Modified for the given ProductCode."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<db:query-single doc:name="Query single" doc:id="2a1584cb-01db-4e50-b581-3d0a5166da12" config-ref="Database_Config">
+					<db:sql ><![CDATA[select max(productCode) from Products;]]></db:sql>
+				</db:query-single>
+				<ee:transform doc:name="Transform Message" doc:id="365afc81-4466-4762-b731-037ba7795542" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "P" ++ ((payload."max(productCode)"[1 to 4] as Number)+1)
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<db:insert doc:name="Insert" doc:id="afd16ec3-9812-43ac-9c21-1bfc6147f921" config-ref="Database_Config">
+					<db:sql ><![CDATA[insert into Products values
+(:productCode, :productName, :productLine, :productScale, :productVendor, :productDescription, :quantityInStock, :buyPrice, :MSRP) ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	'productCode': payload.message,
+	'productName': vars.productName,
+	'productLine': vars.productLine,
+	'productScale': vars.productScale,
+	'productVendor': vars.productVendor,
+	'productDescription': vars.productDescription,
+	'quantityInStock': vars.quantityInStock,
+	'buyPrice': vars.buyPrice,
+	'MSRP': vars.MSRP
+}]]]></db:input-parameters>
+				</db:insert>
+				<ee:transform doc:name="Transform Message" doc:id="249ed6f9-8229-4cde-b243-535c320c9a24">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Product data is Inserted."
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="201" doc:name="httpStatus" doc:id="0f66a8c7-7f64-4933-8549-4a260d18699f" variableName="httpStatus" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

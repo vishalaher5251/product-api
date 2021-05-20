@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="getAllProducts" format="json">
+      <types:shape format="weave" example="examples/getAllProduct.json"><![CDATA[%dw 2.0
+
+type getAllProducts = Array<{|  productCode: String,   productName: String,   productLine: String,   productVendor: String,   quantityInStock: Number {"typeId": "int"},   MSRP: Number {"typeId": "int"}|}> {"example": "[{\\\"productCode\\\":\\\"P1001\\\",\\\"productName\\\":\\\"OnePlus 9 Pro\\\",\\\"productLine\\\":\\\"Mobile\\\",\\\"productVendor\\\":\\\"OnePlus\\\",\\\"quantityInStock\\\":200,\\\"MSRP\\\":64999},{\\\"productCode\\\":\\\"P1002\\\",\\\"productName\\\":\\\"OnePlus 9R\\\",\\\"productLine\\\":\\\"Mobile\\\",\\\"productVendor\\\":\\\"OnePlus\\\",\\\"quantityInStock\\\":250,\\\"MSRP\\\":39999}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="getByProductCode" format="json">
+      <types:shape format="weave" example="examples/productCode.json"><![CDATA[%dw 2.0
+
+type getByProductCode = {|
+  productCode: String, 
+  productName: String, 
+  productLine: String, 
+  productVendor: String, 
+  quantityInStock: Number {"typeId": "int"}, 
+  MSRP: Number {"typeId": "int"}
+|} {"example": "{\\\"productCode\\\":\\\"P1001\\\",\\\"productName\\\":\\\"OnePlus 9 Pro\\\",\\\"productLine\\\":\\\"Mobile\\\",\\\"productVendor\\\":\\\"OnePlus\\\",\\\"quantityInStock\\\":200,\\\"MSRP\\\":64999}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="getAllUpdate" format="json">
+      <types:shape format="weave" example="examples/getAllProduct-1.json"><![CDATA[%dw 2.0
+
+type getAllUpdate = Array<{|  productCode: String,   productName: String,   productLine: String,   productScale: String,   productVendor: String,   productDescription: String,   quantityInStock: Number {"typeId": "int"},   buyPrice: Number {"typeId": "int"},   MSRP: Number {"typeId": "int"}|}> {"example": "[{\\\"productCode\\\":\\\"P1001\\\",\\\"productName\\\":\\\"OnePlus 9 Pro\\\",\\\"productLine\\\":\\\"Mobile\\\",\\\"productScale\\\":\\\"Phone\\\",\\\"productVendor\\\":\\\"OnePlus\\\",\\\"productDescription\\\":\\\"Qualcomm Snapdragon 845\\\",\\\"quantityInStock\\\":200,\\\"buyPrice\\\":65000,\\\"MSRP\\\":64999},{\\\"productCode\\\":\\\"P1002\\\",\\\"productName\\\":\\\"OnePlus 9R\\\",\\\"productLine\\\":\\\"Mobile\\\",\\\"productScale\\\":\\\"Phone\\\",\\\"productVendor\\\":\\\"OnePlus\\\",\\\"productDescription\\\":\\\"Qualcomm Snapdragon 845\\\",\\\"quantityInStock\\\":250,\\\"buyPrice\\\":40000,\\\"MSRP\\\":39999}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="productCode" format="json">
+      <types:shape format="weave" example="examples/productCode-1.json"><![CDATA[%dw 2.0
+
+type productCode = {|
+  productCode: String, 
+  productName: String, 
+  productLine: String, 
+  productScale: String, 
+  productVendor: String, 
+  productDescription: String, 
+  quantityInStock: Number {"typeId": "int"}, 
+  buyPrice: Number {"typeId": "int"}, 
+  MSRP: Number {"typeId": "int"}
+|} {"example": "{\\\"productCode\\\":\\\"P1001\\\",\\\"productName\\\":\\\"OnePlus 9 Pro\\\",\\\"productLine\\\":\\\"Mobile\\\",\\\"productScale\\\":\\\"Phone\\\",\\\"productVendor\\\":\\\"OnePlus\\\",\\\"productDescription\\\":\\\"Qualcomm Snapdragon 845\\\",\\\"quantityInStock\\\":200,\\\"buyPrice\\\":65000,\\\"MSRP\\\":64999}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#2c9a7cbf-4d43-41ac-b370-02945229af2b">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="getAllUpdate"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#cb9fa294-8e93-4d21-bd2e-5bb4e9d5c68c">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="productCode"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

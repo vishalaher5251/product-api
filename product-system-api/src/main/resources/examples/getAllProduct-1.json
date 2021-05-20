@@ -1,0 +1,24 @@
+[
+  {
+    "productCode": "P1001",
+    "productName": "OnePlus 9 Pro",
+    "productLine": "Mobile",
+    "productScale": "Phone",
+    "productVendor": "OnePlus",
+    "productDescription": "Qualcomm Snapdragon 845",
+    "quantityInStock": 200,
+    "buyPrice": 65000,
+    "MSRP": 64999
+  },
+  {
+    "productCode": "P1002",
+    "productName": "OnePlus 9R",
+    "productLine": "Mobile",
+    "productScale": "Phone",
+    "productVendor": "OnePlus",
+    "productDescription": "Qualcomm Snapdragon 845",
+    "quantityInStock": 250,
+    "buyPrice": 40000,
+    "MSRP": 39999
+  }
+]

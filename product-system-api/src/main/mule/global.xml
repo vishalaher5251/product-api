@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<http:listener-config name="productapi-httpListenerConfig">
+        <http:listener-connection host="${http.host}" port="${http.port}" />
+    </http:listener-config>
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="d30594d8-0517-4aeb-8138-a1bb8bdf75b5" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.user}" password="${db.password}" database="${db.database}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="afe7f46b-fb04-48d5-b0e0-5fcdfba030ce" file="product-${env}.yaml" />
+	<configuration doc:name="Configuration" doc:id="0e812a78-b02a-47f2-b5fa-3f2de19a883a" defaultErrorHandler-ref="globalError_Handler" />
+	<error-handler name="globalError_Handler" doc:id="f97f214f-7c6e-44c9-a63e-baaa07281f34" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="09a8f229-1472-49b7-ab73-8ba13ff74798" type="DB1:BAD_SQL_SYNTAX" >
+			<set-payload value="#[&quot;Check the Select in 'GET all Products Flow' for errors. Details:&quot; ++ error.description]" doc:name="Error Payload" doc:id="bda3ffaf-f623-491b-b807-2d5e3433f493" />
+			<set-variable value="500" doc:name="httpStatus" doc:id="4c4f29ed-73df-4cf9-acf5-568df04ed3b6" variableName="httpStatus"/>
+		</on-error-continue>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b1b68742-b660-4400-a7dc-9d039497b5ce" type="DB2:BAD_SQL_SYNTAX" >
+			<set-payload value="#[&quot;Check the QuerySingle in 'GET Products by PC Flow' for errors. Details:&quot; ++ error.description]" doc:name="Error Payload" doc:id="0b756006-fe1e-4504-b5f7-ee876d597a9e" />
+			<set-variable value="500" doc:name="httpStatus" doc:id="1c7a9d14-ce69-4abf-a298-f8e4b4e5d8c8" variableName="httpStatus" />
+		</on-error-continue>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ee9d1515-cffd-4b78-b49d-818ee33b1c26" type="DB:CONNECTIVITY,DB:QUERY_EXECUTION">
+			<set-payload value='#["Error in Database. Details: " ++ error.description]' doc:name="Set Payload" doc:id="341917b0-5523-4742-b90b-eecaa3cf4cbb" />
+			<set-variable value="500" doc:name="httpStatus" doc:id="631759c4-7cff-4b40-a16c-8268c5263d25" variableName="httpStatus"/>
+		</on-error-continue>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4db8211a-8e95-40fc-a973-8e8152f96628" type="ANY">
+			<set-payload value='#["Error Occurred. Details: " ++ error.description]' doc:name="Error Payload" doc:id="73b176ad-29e5-40a1-a6c4-5fcf35b4f3ff" />
+			<set-variable value="500" doc:name="httpStatus" doc:id="ac3a9de4-668b-4bbb-a6da-5fde5e8436e0" variableName="httpStatus" />
+		</on-error-continue>
+	</error-handler>
+	
+	
+	
+	
+	
+</mule>
